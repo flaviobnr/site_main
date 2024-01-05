@@ -1,21 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ptbr">
 <head>
-    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
     <title>Portal_Turma_do_gueto.</title>
 </head>
+<body>
     <p>Aqui você vai encontrar os melhores artigos, downloads e tudo que desejar para sua produção musical.</p>
-    <h1>Venha fazer parte de nossa família. Faça parte de nosso grupo no whatsapp.</h1>    
-    <link><a href="https://chat.whatsapp.com/BDZRwUdBf3R9f4MOAvTluj">Link do nosso grupo no whatsapp.</a>        
-    <br
-    <link><a href="downloads.html">Página de downloads.</a>
-<br
-    <link><a href="Informações.html">Página de Informações.</a>
-<form action="/pagina-processa-dados-do-form" method="post">
-        <H4>Nos envie sugestões, faça sua crítica, peça downloads e o que você precisar. Preencha os campos abaixo com seu nome, email e sua mensagem.</H1>
-            <div>
+        <button id="botaoIniciar" class="botao-taboada" onclick="iniciar()">iniciar</button>
+
+<br>
+    <a href="downloads.html">Página de downloads.</a>
+    <br>
+
+    <h4>Nos envie sugestões, faça sua crítica, peça downloads e o que você precisar. Preencha os campos abaixo com seu nome, email e sua mensagem.</h4>
+    <form>
+        <div>
             <label for="nome">Nome:</label>
             <input type="text" id="nome" />
         </div>
@@ -27,10 +28,12 @@
             <label for="msg">Mensagem:</label>
             <textarea id="msg"></textarea>
         </div>
+        <button type="submit">Enviar</button>
     </form>
-    <button>Enviar</button>
 
-    <h5>Ouça nossa rádio.</h5>
-<audio controls src="https://videos.pornocarioca.com/get_file/13/c8836cf6ed6511990c761e70b25827f3/59000/59369/59369_480p.mp4"></audio>
+    <br>
+    <a href="Informações.html">Página de Informações.</a>
+
+    <script src="taboada.js"></script>
 </body>
 </html>
