@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha</title>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            grid-gap: 5px;
+            width: 300px;
+            margin: 0 auto;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            font-size: 24px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .player-turn {
+            font-size: 24px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo da Velha</h1>
+    <div>
+        <label for="playerX">Nome do jogador X:</label>
+        <input type="text" id="playerX">
+        <br>
+        <label for="playerO">Nome do jogador O:</label>
+        <input type="text" id="playerO">
+        <br>
+        <button id="startGame">Iniciar Jogo</button>
+    </div>
+    <div class="player-turn" id="playerTurn"></div>
+    <div class="board" id="board"></div>
+    <div id="gameOver" class="hidden">
+        <h2>Parabéns!</h2>
+        <p id="winnerText"></p>
+    </div>
+
+    <script>
+        const board = document.getElementById('board');
+        const playerTurn = document.getElementById('playerTurn');
+        const playerXInput = document.getElementById('playerX');
+        const playerOInput = document.getElementById('playerO');
+        const startGameButton = document.getElementById('startGame');
+        const gameOver = document.getElementById('gameOver');
+        const winnerText = document.getElementById('winnerText');
+
+        let currentPlayer = 'X';
+        let boardState = [['', '', ''], ['', '', ''], ['', '', '']];
+        let gameActive = false;
+
+        startGameButton.addEventListener('click', () => {
+            const playerXName = playerXInput.value;
+            const playerOName = playerOInput.value;
+
+            if (playerXName.trim() === '' || playerOName.trim() === '') {
+                alert('Por favor, insira os nomes dos jogadores.');
+                return;
+            }
+
+            currentPlayer = 'X';
+            boardState = [['', '', ''], ['', '', ''], ['', '', '']];
+            gameActive = true;
+
+            playerXInput.style.display = 'none';
+            playerOInput.style.display = 'none';
+            startGameButton.style.display = 'none';
+
+            renderBoard();
+            playerTurn.textContent = `É a vez de ${currentPlayer === 'X' ? playerXName : playerOName}`;
+        });
+
+        function handleCellClick(row, col) {
+            if (!gameActive || boardState[row][col] !== '') return;
+
+            boardState[row][col] = currentPlayer;
+            renderBoard();
+
+            if (checkWin() || checkDraw()) {
+                gameActive = false;
+                const winnerName = currentPlayer === 'X' ? playerXInput.value : playerOInput.value;
+                gameOver.classList.remove('hidden');
+                winnerText.textContent = checkWin() ? `${winnerName} venceu!` : 'Empate!';
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                const nextPlayerName = currentPlayer === 'X' ? playerXInput.value : playerOInput.value;
+                playerTurn.textContent = `É a vez de ${nextPlayerName}`;
+            }
+        }
+
+        function renderBoard() {
+            board.innerHTML = '';
+
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    const cellElement = document.createElement('div');
+                    cellElement.classList.add('cell');
+                    cellElement.textContent = boardState[row][col] || '';
+                    cellElement.addEventListener('click', () => handleCellClick(row, col));
+                    board.appendChild(cellElement);
+
+                    if (boardState[row][col] !== '') {
+                        cellElement.style.cursor = 'default';
+                    }
+
+                    const cellNumber = row * 3 + col + 1;
+                    cellElement.textContent = boardState[row][col] ? boardState[row][col] : cellNumber;
+                    cellElement.setAttribute('tabindex', '0');
+                }
+            }
+        }
+
+        function handleCellKeydown(event, row, col) {
+            if (!gameActive) return;
+
+            switch (event.key) {
+                case 'ArrowUp':
+                    if (row > 0) handleCellClick(row - 1, col);
+                    break;
+                case 'ArrowDown':
+                    if (row < 2) handleCellClick(row + 1, col);
+                    break;
+                case 'ArrowLeft':
+                    if (col > 0) handleCellClick(row, col - 1);
+                    break;
+                case 'ArrowRight':
+                    if (col < 2) handleCellClick(row, col + 1);
+                    break;
+                case 'Enter':
+                    handleCellClick(row, col);
+                    break;
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    const cellNumber = parseInt(event.key);
+                    if (cellNumber >= 1 && cellNumber <= 9) {
+                        const rowIndex = Math.floor((cellNumber - 1) / 3);
+                        const colIndex = (cellNumber - 1) % 3;
+                        handleCellClick(rowIndex, colIndex);
+                    }
+                    break;
+                default:
+                    return;
+            }
+        }
+
+        function checkWin() {
+            const winPatterns = [
+                [[0, 0], [0, 1], [0, 2]],
+                [[1, 0], [1, 1], [1, 2]],
+                [[2, 0], [2, 1], [2, 2]],
+                [[0, 0], [1, 0], [2, 0]],
+                [[0, 1], [1, 1], [2, 1]],
+                [[0, 2], [1, 2], [2, 2]],
+                [[0, 0], [1, 1], [2, 2]],
+                [[0, 2], [1, 1], [2, 0]],
+            ];
+
+            return winPatterns.some(pattern => {
+                return pattern.every(([row, col]) => boardState[row][col] === currentPlayer);
+            });
+        }
+
+        function checkDraw() {
+            return boardState.every(row => row.every(cell => cell !== ''));
+        }
+    </script>
+</body>
+</html>
